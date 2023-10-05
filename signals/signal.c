@@ -1,31 +1,52 @@
-/* hello_signal.c */
-#include <stdio.h>
+#include  <stdio.h>
+#include  <string.h>
+#include  <sys/types.h>
 #include <stdlib.h>
-#include <signal.h>
-#include <unistd.h>
-#include <stdbool.h>
+#include <sys/wait.h>
 #include <time.h>
 
-time_t stop, start;
-bool a = false;
+#define   MAX_COUNT  200
 
-void handler(int signum)
-{ //signal handler
-  stop = time(NULL);
-  printf("Hello World!\n");
-  a = true;
-  //exit(1); //exit after printing
+void  ChildProcess(void);                /* child process prototype  */
+void  ParentProcess(void);               /* parent process prototype */
+
+void  main(void)
+{
+     pid_t pid_1;
+     pid_t pid_2;
+     int status;
+     pid_1 = fork();
+     if (pid_1 == 0){
+          ChildProcess();
+     }
+     else {
+          pid_2 = fork();
+          if (pid_1 == 0){
+               ChildProcess();}
+          else
+               wait(&status);
+               printf("Child Pid: %d has completed", pid_1);
+               wait(&status);
+               printf(" Child Pid: %d has completed", pid_2);
+     }
 }
 
-int main(int argc, char * argv[])
+void  ChildProcess(void)
 {
-  signal(SIGALRM,handler); //register handler to handle SIGALRM
-  alarm(1); //Schedule a SIGALRM for 1 second
-  start = time(NULL);
-  while(a == false){
-    printf("Turing was right!\n");
-    sleep(1)
-  }; //busy wait for signal to be delivered
-  //exit(1);
-  return 0; //never reached
+     int   i;
+     srand(time(NULL));
+     int rand_num = (rand() % 30);
+     for (i = 1; i < rand_num; i++){
+          int rand_t = (rand() % 10);
+     printf("Child Pid: is awake!\nWhere is my Parent: %d?\n", getpid());
+     sleep(rand_t);
+     }
+     exit(1);
+}
+
+void  ParentProcess(void)
+{
+     int   i;
+
+     printf("*** Parent is done ***\n");
 }
